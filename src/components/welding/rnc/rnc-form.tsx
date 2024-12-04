@@ -45,12 +45,12 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
       <SheetTrigger asChild>
         <Button size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
-          Nouveau RNC
+          + Nouveau
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[90vh] sm:h-[85vh] rounded-t-xl">
         <SheetHeader>
-          <SheetTitle>Nouveau rapport de non-conformité</SheetTitle>
+          <SheetTitle>Nouvel événement</SheetTitle>
         </SheetHeader>
         <form onSubmit={handleSubmit} className="space-y-6 mt-6">
           <div className="space-y-2">

@@ -18,7 +18,7 @@ export function RNCList({ rncs, onAddEvent }: RNCListProps) {
   if (rncs.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-textSecondary">Aucun rapport de non-conformité</p>
+        <p className="text-textSecondary">Aucun événement</p>
       </Card>
     );
   }

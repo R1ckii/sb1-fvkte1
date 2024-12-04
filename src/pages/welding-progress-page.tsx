@@ -60,8 +60,8 @@ export function WeldingProgressPage() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const { success } = useToast();
   
-  const selectedPiece = pieces.find(p => p.id === selectedPieceId) || pieces[0];
-  const pieceRNCs = rncs.filter(rnc => rnc.pieceId === selectedPieceId);
+  const selectedPiece = pieces.find(p => p.id === selectedPieceId);
+  const pieceRNCs = selectedPiece ? rncs.filter(rnc => rnc.pieceId === selectedPiece.id) : [];
 
   // Persist RNCs to localStorage whenever they change
   useEffect(() => {
@@ -127,7 +127,20 @@ export function WeldingProgressPage() {
       ],
     };
     
+    // Add the new RNC
     setRncs(prevRncs => [...prevRncs, newRNC]);
+
+    // Update the piece status to RNC
+    setPieces(prev => prev.map(piece => {
+      if (piece.id === data.pieceId) {
+        return {
+          ...piece,
+          status: 'RNC'
+        };
+      }
+      return piece;
+    }));
+
     success({
       title: 'RNC créé',
       description: 'Le rapport de non-conformité a été créé avec succès',
@@ -135,12 +148,16 @@ export function WeldingProgressPage() {
     });
   };
 
+  if (!selectedPiece) {
+    return null; // Or some loading/error state
+  }
+
   return (
     <PageContainer>
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-primary font-nunito">
-            Avancement du soudage
+            Inspection
           </h1>
           <Button
             variant="outline"
@@ -153,21 +170,25 @@ export function WeldingProgressPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            {pieces.map((piece) => (
-              <PieceCard
-                key={piece.id}
-                piece={piece}
-                isSelected={piece.id === selectedPieceId}
-                onClick={(piece) => setSelectedPieceId(piece.id)}
-                onInspectionAction={handleInspectionAction}
-                onDeleteInspection={handleDeleteInspection}
-              />
-            ))}
+            {pieces.map((piece) => {
+              const pieceRncs = rncs.filter(rnc => rnc.pieceId === piece.id);
+              return (
+                <PieceCard
+                  key={piece.id}
+                  piece={piece}
+                  rncs={pieceRncs}
+                  isSelected={piece.id === selectedPieceId}
+                  onClick={(piece) => setSelectedPieceId(piece.id)}
+                  onInspectionAction={handleInspectionAction}
+                  onDeleteInspection={handleDeleteInspection}
+                />
+              );
+            })}
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-primary font-nunito">
-                Rapports de non-conformité
+                Événements
               </h2>
               <RNCForm pieceId={selectedPiece.id} onSubmit={handleRNCSubmit} />
             </div>

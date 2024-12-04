@@ -1,27 +1,40 @@
 import { useState } from 'react';
-import { WeldingPiece, InspectionActionType } from '../../lib/types/welding';
+import { WeldingPiece, InspectionActionType, RNC } from '../../lib/types/welding';
 import { InspectionActions, actionIcons } from './inspection-actions';
 import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
 import { cn, getPieceStatusColor, formatPieceStatus } from '../../lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface PieceCardProps {
   piece: WeldingPiece;
+  rncs: RNC[];
   isSelected: boolean;
   onClick: (piece: WeldingPiece) => void;
   onInspectionAction?: (pieceId: string, actionType: InspectionActionType) => void;
   onDeleteInspection?: (pieceId: string, actionType: InspectionActionType, date: string) => void;
 }
 
+const isPieceConform = (piece: WeldingPiece, rncs: RNC[]): boolean => {
+  // Check if there are any RNCs for this piece
+  if (rncs.length > 0) {
+    return false;
+  }
+  // Also check if all inspections are conform
+  return piece.inspectionHistory?.every(inspection => inspection.isConform !== false) ?? true;
+};
+
 export function PieceCard({ 
   piece, 
+  rncs,
   isSelected, 
   onClick, 
   onInspectionAction,
   onDeleteInspection 
 }: PieceCardProps) {
   const [showActions, setShowActions] = useState(false);
+  const isConform = isPieceConform(piece, rncs);
 
   const handleClick = () => {
     onClick(piece);
@@ -42,12 +55,22 @@ export function PieceCard({
       )}>
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-semibold">{piece.name}</h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold">{piece.name}</h3>
+              <Badge 
+                variant={isConform ? "default" : "destructive"}
+                className={cn(
+                  isConform ? "bg-green-600 hover:bg-green-600/80" : "bg-red-600 hover:bg-red-600/80"
+                )}
+              >
+                {isConform ? "Conforme" : "Non conforme"}
+              </Badge>
+            </div>
             <p className="text-sm text-gray-500">{piece.id}</p>
             <p className="text-sm text-gray-500">
               {piece.projectNumber} - {piece.division}
             </p>
-            {piece.inspectionHistory.length > 0 && (
+            {piece.inspectionHistory?.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {piece.inspectionHistory.map((inspection, index) => {
                   const Icon = actionIcons[inspection.type];
@@ -77,7 +100,7 @@ export function PieceCard({
             <InspectionActions 
               status={piece.status} 
               pieceId={piece.id}
-              inspectionHistory={piece.inspectionHistory}
+              inspectionHistory={piece.inspectionHistory || []}
               onAction={onInspectionAction}
               onDeleteAction={onDeleteInspection}
             />
