@@ -57,14 +57,14 @@ export function PieceCard({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-semibold">{piece.name}</h3>
-              <Badge 
-                variant={isConform ? "default" : "destructive"}
-                className={cn(
-                  isConform ? "bg-green-600 hover:bg-green-600/80" : "bg-red-600 hover:bg-red-600/80"
-                )}
-              >
-                {isConform ? "Conforme" : "Non conforme"}
-              </Badge>
+              {isConform && (
+                <Badge 
+                  variant="default"
+                  className="bg-green-600 hover:bg-green-600/80"
+                >
+                  Conforme
+                </Badge>
+              )}
             </div>
             <p className="text-sm text-gray-500">{piece.id}</p>
             <p className="text-sm text-gray-500">

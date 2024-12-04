@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,14 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
     createdBy: user.name,
   });
 
+  // Update formData when pieceId changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      pieceId, // Update the pieceId while preserving other form data
+    }));
+  }, [pieceId]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.cause.trim() || !formData.description.trim()) {
@@ -45,7 +53,7 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
       <SheetTrigger asChild>
         <Button size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
-          + Nouveau
+          Nouveau
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[90vh] sm:h-[85vh] rounded-t-xl">

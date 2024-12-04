@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PageContainer } from '../components/layout/page-container';
 import { StatusLegend } from '../components/welding/status-legend';
 import { PieceCard } from '../components/welding/piece-card';
@@ -41,32 +41,21 @@ const initialPieces: WeldingPiece[] = [
     projectNumber: '2024-318',
     division: 'Division A',
     name: 'Connecteur avant',
-    status: 'RNC',
+    status: 'REV', // Changed from 'PRO' to 'REV' to avoid duplicate statuses
     scannedAt: '2024-03-20T11:45:00Z',
     inspectionHistory: [],
   },
 ];
 
-const STORAGE_KEY = 'welding-rncs';
-
 export function WeldingProgressPage() {
   const [pieces, setPieces] = useState<WeldingPiece[]>(initialPieces);
   const [selectedPieceId, setSelectedPieceId] = useState<string | null>(initialPieces[0].id);
-  const [rncs, setRncs] = useState<RNC[]>(() => {
-    // Initialize RNCs from localStorage
-    const storedRncs = localStorage.getItem(STORAGE_KEY);
-    return storedRncs ? JSON.parse(storedRncs) : [];
-  });
+  const [rncs, setRncs] = useState<RNC[]>([]);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const { success } = useToast();
   
   const selectedPiece = pieces.find(p => p.id === selectedPieceId);
   const pieceRNCs = selectedPiece ? rncs.filter(rnc => rnc.pieceId === selectedPiece.id) : [];
-
-  // Persist RNCs to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(rncs));
-  }, [rncs]);
 
   const handlePieceScanned = (newPiece: WeldingPiece) => {
     setPieces(prev => [newPiece, ...prev]);
