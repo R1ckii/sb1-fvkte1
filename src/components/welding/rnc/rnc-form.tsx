@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RNCFormData } from '@/lib/types/welding';
 import { useUser } from '@/contexts/user-context';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { Plus } from 'lucide-react';
 
 interface RNCFormProps {
@@ -17,6 +17,7 @@ interface RNCFormProps {
 export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
   const user = useUser();
   const [open, setOpen] = useState(false);
+  const { error } = useToast();
   const [formData, setFormData] = useState<RNCFormData>({
     pieceId,
     cause: '',
@@ -28,7 +29,10 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.cause.trim() || !formData.description.trim()) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
+      error({
+        title: 'Champs requis',
+        description: 'Veuillez remplir tous les champs obligatoires'
+      });
       return;
     }
     onSubmit(formData);

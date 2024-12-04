@@ -2,6 +2,14 @@ export type InspectionStatus = 'pending' | 'in-progress' | 'completed' | 'failed
 
 export type PieceStatus = 'REV' | 'RNC' | 'ANN' | 'ATT' | 'EXIST' | 'DIM' | 'PRO';
 
+export type InspectionActionType = 'dimensional' | 'visual' | 'weldless' | 'bolting' | 'camber';
+
+export interface InspectionHistory {
+  type: InspectionActionType;
+  date: string;
+  isConform?: boolean;
+}
+
 export interface StatusInfo {
   label: string;
   color: string;
@@ -15,6 +23,7 @@ export interface WeldingPiece {
   name: string;
   status: PieceStatus;
   scannedAt: string;
+  inspectionHistory: InspectionHistory[];
 }
 
 export interface RNC {
@@ -38,3 +47,9 @@ export interface RNCEvent {
 }
 
 export type RNCFormData = Omit<RNC, 'id' | 'createdAt' | 'status' | 'events'>;
+
+export interface InspectionAction {
+  type: InspectionActionType;
+  label: string;
+  isEnabled: (status: PieceStatus) => boolean;
+}

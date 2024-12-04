@@ -1,9 +1,8 @@
 import * as React from 'react';
-
 import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 
-const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_LIMIT = 3;
+const TOAST_REMOVE_DELAY = 5000; // 5 seconds
 
 type ToasterToast = ToastProps & {
   id: string;
@@ -12,13 +11,6 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement;
 };
 
-const actionTypes = {
-  ADD_TOAST: 'ADD_TOAST',
-  UPDATE_TOAST: 'UPDATE_TOAST',
-  DISMISS_TOAST: 'DISMISS_TOAST',
-  REMOVE_TOAST: 'REMOVE_TOAST',
-} as const;
-
 let count = 0;
 
 function genId() {
@@ -26,23 +18,21 @@ function genId() {
   return count.toString();
 }
 
-type ActionType = typeof actionTypes;
-
 type Action =
   | {
-      type: ActionType['ADD_TOAST'];
+      type: 'ADD_TOAST';
       toast: ToasterToast;
     }
   | {
-      type: ActionType['UPDATE_TOAST'];
+      type: 'UPDATE_TOAST';
       toast: Partial<ToasterToast>;
     }
   | {
-      type: ActionType['DISMISS_TOAST'];
+      type: 'DISMISS_TOAST';
       toastId?: ToasterToast['id'];
     }
   | {
-      type: ActionType['REMOVE_TOAST'];
+      type: 'REMOVE_TOAST';
       toastId?: ToasterToast['id'];
     };
 
@@ -87,8 +77,6 @@ export const reducer = (state: State, action: Action): State => {
     case 'DISMISS_TOAST': {
       const { toastId } = action;
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId);
       } else {
@@ -149,6 +137,7 @@ function toast({ ...props }: Toast) {
   dispatch({
     type: 'ADD_TOAST',
     toast: {
+      variant: 'default',
       ...props,
       id,
       open: true,
@@ -164,6 +153,12 @@ function toast({ ...props }: Toast) {
     update,
   };
 }
+
+// Helper functions for different toast types
+const success = (props: Omit<Toast, 'variant'>) => toast({ ...props, variant: 'success' });
+const error = (props: Omit<Toast, 'variant'>) => toast({ ...props, variant: 'destructive' });
+const warning = (props: Omit<Toast, 'variant'>) => toast({ ...props, variant: 'warning' });
+const info = (props: Omit<Toast, 'variant'>) => toast({ ...props, variant: 'info' });
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState);
@@ -181,6 +176,10 @@ function useToast() {
   return {
     ...state,
     toast,
+    success,
+    error,
+    warning,
+    info,
     dismiss: (toastId?: string) => dispatch({ type: 'DISMISS_TOAST', toastId }),
   };
 }

@@ -4,7 +4,7 @@ import { HomePage } from '@/pages/home-page';
 import { WeldingProgressPage } from '@/pages/welding-progress-page';
 import { ROUTES } from '@/lib/constants';
 import { UserProvider } from '@/contexts/user-context';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
 import './App.css';
 
 function App() {

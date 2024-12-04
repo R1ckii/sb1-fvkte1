@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Scan, Camera } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { WeldingPiece } from '@/lib/types/welding';
 import { cn } from '@/lib/utils';
 
@@ -37,6 +37,7 @@ let scanCounter = 0;
 
 export function PieceScanner({ onPieceScanned }: PieceScannerProps) {
   const [isScanning, setIsScanning] = useState(false);
+  const { success } = useToast();
 
   const simulateScan = () => {
     setIsScanning(true);
@@ -51,7 +52,11 @@ export function PieceScanner({ onPieceScanned }: PieceScannerProps) {
       
       onPieceScanned(scannedPiece);
       setIsScanning(false);
-      toast.success('Pièce scannée avec succès');
+      success({
+        title: 'Scan réussi',
+        description: `La pièce ${scannedPiece.name} a été scannée avec succès`,
+        duration: 2000
+      });
     }, 2000);
   };
 
