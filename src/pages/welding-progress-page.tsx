@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { PageContainer } from '../components/layout/page-container';
 import { StatusLegend } from '../components/welding/status-legend';
 import { PieceCard } from '../components/welding/piece-card';
-import { RNCForm } from '../components/welding/rnc/rnc-form';
-import { RNCList } from '../components/welding/rnc/rnc-list';
 import { PieceScanner } from '../components/welding/piece-scanner';
 import { WeldingPiece, RNC, RNCFormData, InspectionActionType } from '../lib/types/welding';
 import { useToast } from '../hooks/use-toast';
@@ -41,7 +39,7 @@ const initialPieces: WeldingPiece[] = [
     projectNumber: '2024-318',
     division: 'Division A',
     name: 'Connecteur avant',
-    status: 'REV', // Changed from 'PRO' to 'REV' to avoid duplicate statuses
+    status: 'REV',
     scannedAt: '2024-03-20T11:45:00Z',
     inspectionHistory: [],
   },
@@ -55,7 +53,6 @@ export function WeldingProgressPage() {
   const { success } = useToast();
   
   const selectedPiece = pieces.find(p => p.id === selectedPieceId);
-  const pieceRNCs = selectedPiece ? rncs.filter(rnc => rnc.pieceId === selectedPiece.id) : [];
 
   const handlePieceScanned = (newPiece: WeldingPiece) => {
     setPieces(prev => [newPiece, ...prev]);
@@ -157,32 +154,22 @@ export function WeldingProgressPage() {
             Scanner une pièce
           </Button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            {pieces.map((piece) => {
-              const pieceRncs = rncs.filter(rnc => rnc.pieceId === piece.id);
-              return (
-                <PieceCard
-                  key={piece.id}
-                  piece={piece}
-                  rncs={pieceRncs}
-                  isSelected={piece.id === selectedPieceId}
-                  onClick={(piece) => setSelectedPieceId(piece.id)}
-                  onInspectionAction={handleInspectionAction}
-                  onDeleteInspection={handleDeleteInspection}
-                />
-              );
-            })}
-          </div>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-primary font-nunito">
-                Événements
-              </h2>
-              <RNCForm pieceId={selectedPiece.id} onSubmit={handleRNCSubmit} />
-            </div>
-            <RNCList rncs={pieceRNCs} />
-          </div>
+        <div className="space-y-4">
+          {pieces.map((piece) => {
+            const pieceRncs = rncs.filter(rnc => rnc.pieceId === piece.id);
+            return (
+              <PieceCard
+                key={piece.id}
+                piece={piece}
+                rncs={pieceRncs}
+                isSelected={piece.id === selectedPieceId}
+                onClick={(piece) => setSelectedPieceId(piece.id)}
+                onInspectionAction={handleInspectionAction}
+                onDeleteInspection={handleDeleteInspection}
+                onRNCSubmit={handleRNCSubmit}
+              />
+            );
+          })}
         </div>
       </div>
       <StatusLegend />

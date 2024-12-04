@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { WeldingPiece, InspectionActionType, RNC } from '../../lib/types/welding';
+import { WeldingPiece, InspectionActionType, RNC, RNCFormData } from '../../lib/types/welding';
 import { InspectionActions, actionIcons } from './inspection-actions';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { cn, getPieceStatusColor, formatPieceStatus } from '../../lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { RNCList } from './rnc/rnc-list';
+import { RNCForm } from './rnc/rnc-form';
 
 interface PieceCardProps {
   piece: WeldingPiece;
@@ -14,6 +16,7 @@ interface PieceCardProps {
   onClick: (piece: WeldingPiece) => void;
   onInspectionAction?: (pieceId: string, actionType: InspectionActionType) => void;
   onDeleteInspection?: (pieceId: string, actionType: InspectionActionType, date: string) => void;
+  onRNCSubmit?: (data: RNCFormData) => void;
 }
 
 const isPieceConform = (piece: WeldingPiece, rncs: RNC[]): boolean => {
@@ -31,7 +34,8 @@ export function PieceCard({
   isSelected, 
   onClick, 
   onInspectionAction,
-  onDeleteInspection 
+  onDeleteInspection,
+  onRNCSubmit
 }: PieceCardProps) {
   const [showActions, setShowActions] = useState(false);
   const isConform = isPieceConform(piece, rncs);
@@ -41,13 +45,33 @@ export function PieceCard({
     setShowActions(!showActions);
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    // Don't toggle if clicking:
+    // 1. Inside the actions content
+    // 2. Inside any dialog/sheet/modal
+    // 3. Inside any form elements
+    if (
+      target.closest('.actions-content') !== null ||
+      target.closest('[role="dialog"]') !== null ||
+      target.closest('form') !== null ||
+      target.closest('button') !== null ||
+      target.closest('input') !== null ||
+      target.closest('select') !== null ||
+      target.closest('textarea') !== null
+    ) {
+      return;
+    }
+    handleClick();
+  };
+
   return (
     <Card 
       className={cn(
         "cursor-pointer transition-all hover:shadow-md",
         isSelected && "border-primary"
       )}
-      onClick={handleClick}
+      onClick={handleCardClick}
     >
       <CardContent className={cn(
         "p-4 transition-all duration-200",
@@ -95,15 +119,28 @@ export function PieceCard({
             {formatPieceStatus(piece.status)}
           </span>
         </div>
-        {showActions && isSelected && onInspectionAction && (
-          <div className="mt-4 pt-4 border-t">
-            <InspectionActions 
-              status={piece.status} 
-              pieceId={piece.id}
-              inspectionHistory={piece.inspectionHistory || []}
-              onAction={onInspectionAction}
-              onDeleteAction={onDeleteInspection}
-            />
+        {showActions && isSelected && (
+          <div className="mt-4 space-y-4 actions-content">
+            {onInspectionAction && (
+              <div className="pt-4 border-t">
+                <InspectionActions 
+                  status={piece.status} 
+                  pieceId={piece.id}
+                  inspectionHistory={piece.inspectionHistory || []}
+                  onAction={onInspectionAction}
+                  onDeleteAction={onDeleteInspection}
+                />
+              </div>
+            )}
+            <div className="pt-4 border-t">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-primary font-nunito">
+                  Événements
+                </h2>
+                {onRNCSubmit && <RNCForm pieceId={piece.id} onSubmit={onRNCSubmit} />}
+              </div>
+              <RNCList rncs={rncs} />
+            </div>
           </div>
         )}
       </CardContent>
