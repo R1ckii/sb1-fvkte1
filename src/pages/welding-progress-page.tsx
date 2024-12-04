@@ -5,12 +5,7 @@ import { PieceCard } from '../components/welding/piece-card';
 import { PieceScanner } from '../components/welding/piece-scanner';
 import { WeldingPiece, RNC, RNCFormData, InspectionActionType } from '../lib/types/welding';
 import { useToast } from '../hooks/use-toast';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '../components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Button } from '../components/ui/button';
 import { QrCode } from 'lucide-react';
 
@@ -173,14 +168,14 @@ export function WeldingProgressPage() {
         </div>
       </div>
       <StatusLegend />
-      <Sheet open={isScannerOpen} onOpenChange={setIsScannerOpen}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-xl">
-          <SheetHeader>
-            <SheetTitle>Scanner une pièce</SheetTitle>
-          </SheetHeader>
+      <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Scanner une pièce</DialogTitle>
+          </DialogHeader>
           <PieceScanner onPieceScanned={handlePieceScanned} />
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 }

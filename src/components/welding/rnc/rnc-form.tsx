@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,11 +26,10 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
     createdBy: user.name,
   });
 
-  // Update formData when pieceId changes
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
-      pieceId, // Update the pieceId while preserving other form data
+      pieceId,
     }));
   }, [pieceId]);
 
@@ -49,20 +48,20 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
           Nouveau
         </Button>
-      </SheetTrigger>
-      <SheetContent side="bottom" className="h-[90vh] sm:h-[85vh] rounded-t-xl">
-        <SheetHeader>
-          <SheetTitle>Nouvel événement</SheetTitle>
-        </SheetHeader>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Nouvel événement</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 mt-6">
           <div className="space-y-2">
-            <Label htmlFor="cause" className="text-base">
+            <Label htmlFor="cause" className="text-base font-medium">
               Cause <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -70,12 +69,12 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
               value={formData.cause}
               onChange={(e) => setFormData({ ...formData, cause: e.target.value })}
               placeholder="Ex: Dimension hors tolérance"
-              className="h-12"
+              className="h-11"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-base">
+            <Label htmlFor="description" className="text-base font-medium">
               Description <span className="text-red-500">*</span>
             </Label>
             <Textarea
@@ -88,7 +87,7 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="reference" className="text-base">
+            <Label htmlFor="reference" className="text-base font-medium">
               Référence
             </Label>
             <Input
@@ -96,24 +95,24 @@ export function RNCForm({ pieceId, onSubmit }: RNCFormProps) {
               value={formData.reference}
               onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
               placeholder="Ex: NCR-2024-001"
-              className="h-12"
+              className="h-11"
             />
           </div>
-          <div className="flex gap-3 pt-4 sticky bottom-0 bg-background pb-6">
+          <div className="flex gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
-              className="flex-1 h-12"
+              className="flex-1 h-11"
               onClick={() => setOpen(false)}
             >
               Annuler
             </Button>
-            <Button type="submit" className="flex-1 h-12">
+            <Button type="submit" className="flex-1 h-11">
               Créer le RNC
             </Button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
