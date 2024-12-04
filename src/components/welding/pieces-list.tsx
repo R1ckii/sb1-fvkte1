@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { WeldingPiece } from '@/lib/types/welding';
 import { cn, formatPieceStatus, getPieceStatusColor } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Scan } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 interface PiecesListProps {
   pieces: WeldingPiece[];
