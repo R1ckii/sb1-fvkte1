@@ -78,7 +78,7 @@ export function InspectionActions({ status, pieceId, inspectionHistory, onAction
   const [progress, setProgress] = useState(0);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const progressTimer = useRef<NodeJS.Timeout | null>(null);
-  const { success, error, info } = useToast();
+  const { success, error } = useToast();
 
   const handleAction = (action: InspectionAction) => {
     onAction(pieceId, action.type);
@@ -104,15 +104,6 @@ export function InspectionActions({ status, pieceId, inspectionHistory, onAction
         duration: 2000
       });
     }
-  };
-
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Stop event from bubbling up to the card
-    info({
-      title: 'Supprimer la date',
-      description: 'Maintenez le bouton pendant 3 secondes pour supprimer la date',
-      duration: 2000
-    });
   };
 
   const startPress = (actionType: InspectionActionType, e: React.MouseEvent | React.TouchEvent) => {
@@ -188,7 +179,6 @@ export function InspectionActions({ status, pieceId, inspectionHistory, onAction
                 onMouseLeave={endPress}
                 onTouchStart={(e) => startPress(action.type, e)}
                 onTouchEnd={endPress}
-                onClick={handleDeleteClick}
                 title="Maintenir 3 secondes pour supprimer"
               >
                 <Trash weight="bold" className={`h-4 w-4 relative z-10 transition-transform ${isPressed ? 'scale-90' : 'scale-100'}`} />
