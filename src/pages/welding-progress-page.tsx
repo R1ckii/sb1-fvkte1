@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { PageContainer } from '@/components/layout/page-container';
-import { InspectionActions } from '@/components/welding/inspection-actions';
-import { StatusLegend } from '@/components/welding/status-legend';
-import { PiecesList } from '@/components/welding/pieces-list';
-import { RNCForm } from '@/components/welding/rnc/rnc-form';
-import { RNCList } from '@/components/welding/rnc/rnc-list';
-import { PieceScanner } from '@/components/welding/piece-scanner';
-import { WeldingPiece, RNC, RNCFormData } from '@/lib/types/welding';
+import { useState, useEffect } from 'react';
+import { PageContainer } from '../components/layout/page-container';
+import { InspectionActions } from '../components/welding/inspection-actions';
+import { StatusLegend } from '../components/welding/status-legend';
+import { PiecesList } from '../components/welding/pieces-list';
+import { RNCForm } from '../components/welding/rnc/rnc-form';
+import { RNCList } from '../components/welding/rnc/rnc-list';
+import { PieceScanner } from '../components/welding/piece-scanner';
+import { WeldingPiece, RNC, RNCFormData } from '../lib/types/welding';
 import { toast } from 'sonner';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
+} from '../components/ui/sheet';
 
 // Mock data for demonstration
 const initialPieces: WeldingPiece[] = [
@@ -43,14 +43,25 @@ const initialPieces: WeldingPiece[] = [
   },
 ];
 
+const STORAGE_KEY = 'welding-rncs';
+
 export function WeldingProgressPage() {
   const [pieces, setPieces] = useState<WeldingPiece[]>(initialPieces);
   const [selectedPieceId, setSelectedPieceId] = useState<string | null>(initialPieces[0].id);
-  const [rncs, setRncs] = useState<RNC[]>([]);
+  const [rncs, setRncs] = useState<RNC[]>(() => {
+    // Initialize RNCs from localStorage
+    const storedRncs = localStorage.getItem(STORAGE_KEY);
+    return storedRncs ? JSON.parse(storedRncs) : [];
+  });
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   
   const selectedPiece = pieces.find(p => p.id === selectedPieceId) || pieces[0];
   const pieceRNCs = rncs.filter(rnc => rnc.pieceId === selectedPieceId);
+
+  // Persist RNCs to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(rncs));
+  }, [rncs]);
 
   const handlePieceScanned = (newPiece: WeldingPiece) => {
     setPieces(prev => [newPiece, ...prev]);
@@ -79,7 +90,7 @@ export function WeldingProgressPage() {
       ],
     };
     
-    setRncs([...rncs, newRNC]);
+    setRncs(prevRncs => [...prevRncs, newRNC]);
     toast.success('RNC créé avec succès');
   };
 
@@ -94,7 +105,7 @@ export function WeldingProgressPage() {
             <PiecesList
               pieces={pieces}
               selectedPieceId={selectedPieceId}
-              onPieceSelect={(piece) => setSelectedPieceId(piece.id)}
+              onPieceSelect={(piece: WeldingPiece) => setSelectedPieceId(piece.id)}
               onScanClick={() => setIsScannerOpen(true)}
             />
             <InspectionActions status={selectedPiece.status} />
